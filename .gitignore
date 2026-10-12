@@ -2,3 +2,4 @@ appsettings.json
 appsettings.*.json
 bin/
 obj/
+/DevPortfolio/DevPortfolio.API/.env
