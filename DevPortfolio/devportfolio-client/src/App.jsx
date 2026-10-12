@@ -3,6 +3,7 @@ import ScoreRing from "./components/ScoreRing";
 import DropZone from "./components/DropZone";
 import HistoryPanel from "./components/HistoryPanel";
 import Spinner from "./components/Spinner";
+const API_BASE_URL = "https://cvmatch-api-6qox.onrender.com";
 import { Document, Paragraph, TextRun, Packer } from "docx";
 import { saveAs } from "file-saver";
 import "./App.css";
@@ -74,7 +75,7 @@ const [history, setHistory] = useState([]);
 
 }
    useEffect(() => {
-  fetch("http://localhost:5286/api/History")
+  fetch(`${API_BASE_URL}/api/History`)
     .then((res) => res.json())
   .then((data) => setHistory(data));
 }, []);
@@ -93,7 +94,10 @@ const [history, setHistory] = useState([]);
     form.append("jobDescription", jobDesc);
     form.append("jobTitle", jobTitle);
     form.append("company", company);
-    const res  = await fetch("/api/analyse", { method: "POST", body: form });
+    const res  = await fetch(`${API_BASE_URL}/api/analyse`, {
+  method: "POST",
+  body: form
+})
     const data = await res.json();
     setResult(data);
 
@@ -105,7 +109,7 @@ const [history, setHistory] = useState([]);
   score: data.score,
 };
 
-const saveRes = await fetch("http://localhost:5286/api/History", {
+const saveRes = await fetch(`${API_BASE_URL}/api/History`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(newEntry),
@@ -128,7 +132,10 @@ setLoading(false);
     form.append("jobDescription", jobDesc);
     form.append("jobTitle", jobTitle);
     form.append("company", company);
-    const res  = await fetch("/api/coverletter", { method: "POST", body: form });
+    const res  = await fetch(`${API_BASE_URL}/api/coverletter`, {
+  method: "POST",
+  body: form
+})
     const data = await res.json();
     setCoverLetter(data.coverLetter);
 
