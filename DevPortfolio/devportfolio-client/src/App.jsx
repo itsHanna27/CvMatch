@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ScoreRing from "./components/ScoreRing";
 import DropZone from "./components/DropZone";
 import HistoryPanel from "./components/HistoryPanel";
@@ -20,13 +20,13 @@ import {
 
 // dummy data
 
-const INITIAL_HISTORY = [
-  { id: 1, title: "Frontend Developer", company: "Google",    score: 82, date: "12 Jun 2025 · 10:30 AM" },
-  { id: 2, title: "Backend Developer",  company: "Microsoft", score: 76, date: "10 Jun 2025 · 4:15 PM"  },
-  { id: 3, title: "Full Stack Engineer",company: "Stripe",    score: 85, date: "9 Jun 2025 · 11:20 AM"  },
-  { id: 4, title: "Software Engineer",  company: "Amazon",    score: 71, date: "7 Jun 2025 · 2:45 PM"   },
-  { id: 5, title: "Frontend Developer", company: "Tesla",     score: 68, date: "5 Jun 2025 · 9:10 AM"   },
-];
+//const INITIAL_HISTORY = [
+//  { id: 1, title: "Frontend Developer", company: "Nimbusly",    score: 82, date: "28 Jun 2026 · 10:30 AM" },
+//  { id: 2, title: "Backend Developer",  company: "Vertexa",     score: 76, date: "25 Jun 2026 · 4:15 PM"  },
+//  { id: 3, title: "Full Stack Engineer",company: "Brightloop",  score: 85, date: "23 Jun 2026 · 11:20 AM" },
+//  { id: 4, title: "Software Engineer",  company: "Northstack",  score: 71, date: "20 Jun 2026 · 2:45 PM"  },
+ // { id: 5, title: "Frontend Developer", company: "Cobaltway",   score: 68, date: "18 Jun 2026 · 9:10 AM"  },
+// ];
 
 
 // Helpers
@@ -49,7 +49,7 @@ export default function App() {
   const [jobDesc,      setJobDesc]      = useState("");
   const [result,       setResult]       = useState(null);
   const [loading,      setLoading]      = useState(false);
-  const [history,      setHistory]      = useState(INITIAL_HISTORY);
+const [history, setHistory] = useState([]);
   const [coverLetter,  setCoverLetter]  = useState(null);   // cover letter text
   const [clLoading,    setClLoading]    = useState(false);  // cover letter loading state
   const [copied,       setCopied]       = useState(false);  // copy to clipboard state
@@ -73,6 +73,12 @@ export default function App() {
   saveAs(blob, `cover-letter-${company || "download"}.docx`);
 
 }
+   useEffect(() => {
+  fetch("http://localhost:5286/api/History")
+    .then((res) => res.json())
+  .then((data) => setHistory(data));
+}, []);
+
   async function handleAnalyse() {
     if (!cvFile)         { alert("Please upload your CV first.");    return; }
     if (!jobDesc.trim()) { alert("Please paste a job description."); return; }
@@ -91,22 +97,25 @@ export default function App() {
     const data = await res.json();
     setResult(data);
 
-    setHistory((prev) => [
-      {
-        id: Date.now(),
-        title:   jobTitle || "Untitled Role",
-        company: company  || "—",
-        score:   data.score,
-        date: new Date().toLocaleString("en-GB", {
-          day: "2-digit", month: "short", year: "numeric",
-          hour: "2-digit", minute: "2-digit",
-        }),
-      },
-      ...prev.slice(0, 7),
-    ]);
 
-    setLoading(false);
+
+  const newEntry = {
+  title: jobTitle || "Untitled Role",
+  company: company || "—",
+  score: data.score,
+};
+
+const saveRes = await fetch("http://localhost:5286/api/History", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(newEntry),
+});
+const savedEntry = await saveRes.json();
+
+setHistory((prev) => [savedEntry, ...prev.slice(0, 7)]);
+setLoading(false);
   }
+
 
   async function handleGenerateCoverLetter() {
     if (!cvFile || !jobDesc.trim()) return;

@@ -22,7 +22,13 @@ export default function HistoryPanel({ history }) {
               <div>
                 <h3>{h.title}</h3>
                 <p>{h.company}</p>
-                <p className="history-date">{h.date}</p>
+               <p className="history-date">
+              {new Date(h.date).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </p>
               </div>
               <span className="score-badge" style={{ color, background: bg }}>
                 {h.score}%
