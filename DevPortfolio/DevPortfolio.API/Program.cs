@@ -1,4 +1,3 @@
-
 using DevPortfolio.API.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +20,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
@@ -30,7 +29,6 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 app.UseCors("AllowReact");
-
 app.MapControllers();
 
 app.Run();
